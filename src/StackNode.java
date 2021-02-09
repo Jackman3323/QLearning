@@ -1,10 +1,13 @@
 /**
- * Jack Hughes
  * StackNode.java
+ *
  * This is a verison of node optimized to be used in stacks. Nodes
  * store data and keep track of the node below them.
- * 10-30-20
- * JBH
+ *
+ * Authors: Jack Hughes
+ * Date: 10-30-20
+ * -JBH
+ *
  * @param <T>
  */
 public class StackNode<T>{

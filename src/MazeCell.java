@@ -1,5 +1,15 @@
 import java.awt.*;
 
+/**
+ * MazeCell.java
+ *
+ * This is a class intended to be used as a cell within a maze. It stores its location, whether or not it's the start or
+ * the finish, and it's wall data.
+ *
+ * Authors: Jack Hughes
+ * Date: 2-8-21
+ * -JBH
+ */
 public class MazeCell {
     //INSTANCE-DATA
     private Point location;
@@ -21,7 +31,7 @@ public class MazeCell {
         hasTopWall = true;
     }
 
-    //METHODS
+    //METHODS, all self explanatory setters and getters
     public void setWalls(boolean top, boolean left, boolean right, boolean bottom){
         this.hasRightWall = right;
         this.hasTopWall = top;
@@ -97,6 +107,7 @@ public class MazeCell {
         return hasRightWall;
     }
 
+    //toString for debugging
     @Override
     public String toString() {
         return "MazeCell{" +
