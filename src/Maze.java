@@ -38,8 +38,12 @@ public class Maze {
         this.r = new Random();
     }
 
+    public Maze() {
+
+    }
+
     //MAIN-METHODS
-    private void generateMaze() {
+    void generateMaze() {
         this.mazeCells = new ArrayList<ArrayList<MazeCell>>();
         for (int i = 0; i < this.height; i++) {
             this.mazeCells.add(new ArrayList<MazeCell>());
