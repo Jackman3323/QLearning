@@ -84,6 +84,11 @@ public class MazeCell {
             this.hasTopWall = false;
         }
     }
+
+    public boolean atFinish(){
+        return isFinish;
+    }
+
     public boolean hasBottomWall() {
         return hasBottomWall;
     }
