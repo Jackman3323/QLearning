@@ -1,10 +1,19 @@
-import sun.util.resources.cldr.rof.CurrencyNames_rof;
-
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Random;
 
+/**
+ * Maze.java
+ *
+ * This program generates a maze made up of maze cells. It has a start point which is always on the top of the maze,
+ * and it has a finish point which can be anywhere. The maze is always solveable and every pathway is always reachable,
+ * although most will be long-cuts or dead ends in relation to solving the maze. The strings used for different parts
+ * of the maze are defined in the instance data section as static final strings.
+ *
+ * Authors: Jack Hughes
+ * Date: 2-8-21
+ * -JBH
+ */
 public class Maze {
     //INSTANCE-DATA
     //maze: global variable to store the maze matrix

@@ -1,9 +1,11 @@
 /**
- * Author: Jack Hughes
  * Stack.java
- * This class queues a bunch of StackNodes in classic stack fasion
+ *
+ * This class queues a bunch of StackNodes in classic stack fashion
+ *
+ * Authors: Jack Hughes
  * Date: 10-30-20
- * On My Honor: JH
+ * -JBH
  *
  * @param <T>
  */
