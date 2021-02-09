@@ -45,7 +45,6 @@ public class Maze {
         mazeCells.get(0).get(randomStartLocation).setStart(true);
         ArrayList<Point> alreadySearched = new ArrayList<Point>();
         ArrayList<Point> toSearch = new ArrayList<Point>();
-        System.out.println(new Point(randomStartLocation, 0));
         Point exit = new Point();
         while (stack.size() > 0) {
             //PUSH NEW POTENTIALS ONTO THE STACK
@@ -138,8 +137,15 @@ public class Maze {
         int colCounter = 0;
         //This method interprets the arraylist of maze cell monstrosity into a nice string matrix and returns it.
         String[][] toReturn = new String[(this.height * 2) + 1][(this.width * 2) + 1];
-        for (int r = 0; r < (this.height * 2) + 1; r += 2) {
-            for (int c = 0; c < (this.width * 2) + 1; c += 2) {
+        for (int r = 0; r < (this.height * 2); r += 2) {
+            colCounter = 0;
+            for (int c = 0; c < (this.width * 2); c += 2) {
+                if(rowCounter >= this.height){
+                    rowCounter = this.height-1;
+                }
+                if(colCounter >= this.width){
+                    colCounter = this.width -1;
+                }
                 MazeCell curCell = this.mazeCells.get(rowCounter).get(colCounter);
                 if (curCell.hasTopWall()) {
                     toReturn[r][c] = ROOF;
@@ -154,13 +160,11 @@ public class Maze {
                     toReturn[r + 1][c] = HOLE;
                 }
                 if(r == (this.height * 2) -2) {
-                    System.out.println("R = " + r);
                     if (curCell.hasBottomWall()){
                         toReturn[r + 2][c] = ROOF;
                         toReturn[r + 2][c + 1] = ROOF;
                         toReturn[r + 2][c + 2] = WALL;
                     } else {
-                        System.out.println(curCell.toString());
                         toReturn[r + 2][c] = ROOF;
                         toReturn[r + 2][c + 1] = HOLE;
                         toReturn[r + 2][c + 2] = WALL;
