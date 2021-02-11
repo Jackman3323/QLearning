@@ -1,27 +1,31 @@
+import com.sun.java.swing.action.HelpAction;
+
+import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
-class QLearning extends Maze{
+class QLearning {
 
     private final double alpha = 0.1; // Learning rate
     private final double gamma = 0.9; // Eagerness - 0 looks in the near future, 1 looks in the distant future
 
-    private final int mazeWidth = 3;
-    private final int mazeHeight = 3;
+    private final int mazeWidth = 10;
+    private final int mazeHeight = 5;
     private final int statesCount = mazeHeight * mazeWidth;
 
     private final int reward = 100;
     private final int penalty = -10;
 
-    private char[][] maze;  // Maze read from file
+    private String[][] maze;  // Maze read from file
     private int[][] R;       // Reward lookup
     private double[][] Q;    // Q learning
 
     public QLearning(int width, int height) {
-        super(width, height);
+
     }
 
     public QLearning() {
@@ -31,126 +35,109 @@ class QLearning extends Maze{
 
     public static void main(String args[]) {
         QLearning ql = new QLearning();
-
-        ql.generateMaze();
+        ql.init();
         ql.calculateQ();
         ql.printQ();
         ql.printPolicy();
     }
 
     public void init() {
+        Maze mazeGenerator = new Maze(10, 5);
+        this.maze = mazeGenerator.getMaze();
         File file = new File("maze.txt");
-
         R = new int[statesCount][statesCount];
         Q = new double[statesCount][statesCount];
-        maze = new char[mazeHeight][mazeWidth];
 
+        Point startPoint = mazeGenerator.getStart();
 
-        try (FileInputStream fis = new FileInputStream(file)) {
-
-            int i = 0;
-            int j = 0;
-
-            int content;
-
-            // Read the maze from the input file
-            while ((content = fis.read()) != -1) {
-                char c = (char) content;
-                if (c != '0' && c != 'F' && c != 'X') {
-                    continue;
-                }
-                maze[i][j] = c;
-                j++;
-                if (j == mazeWidth) {
-                    j = 0;
-                    i++;
+        int i = (int) startPoint.getX();
+        int j = (int) startPoint.getY();
+        int k = i * mazeWidth;
+        // We will navigate through the reward matrix R using k index
+        for (int dumb = 0; dumb < statesCount; dumb++) {
+            // We will navigate with i and j through the maze, so we need
+            // to translate k into i and j
+            i = k / mazeWidth;
+            j = k - i * mazeWidth;
+            for(int r =0; r < this.mazeHeight; r++){
+                for(int c =0; c < this.mazeWidth; c++){
+                    R[r][c] = -1;
                 }
             }
 
-            // We will navigate through the reward matrix R using k index
-            for (int k = 0; k < statesCount; k++) {
-
-                // We will navigate with i and j through the maze, so we need
-                // to translate k into i and j
-                i = k / mazeWidth;
-                j = k - i * mazeWidth;
-
-                // Fill in the reward matrix with -1
-                for (int s = 0; s < statesCount; s++) {
-                    R[k][s] = -1;
+            // If not in final state or a wall try moving in all directions in the maze
+            if (!maze[i][j].equals("F")) {
+                // Try to move left in the maze
+                int goLeft = j - 1;
+                if (goLeft >= 0) {
+                    int target = i * mazeWidth + goLeft;
+                    if (maze[i][goLeft].equals(" ")) {
+                        R[k][target] = 0;
+                    } else if (maze[i][goLeft].equals("F")) {
+                        R[k][target] = reward;
+                    } else {
+                        R[k][target] = penalty;
+                    }
                 }
 
-                // If not in final state or a wall try moving in all directions in the maze
-                if (maze[i][j] != 'F') {
-
-                    // Try to move left in the maze
-                    int goLeft = j - 1;
-                    if (goLeft >= 0) {
-                        int target = i * mazeWidth + goLeft;
-                        if (maze[i][goLeft] == '0') {
-                            R[k][target] = 0;
-                        } else if (maze[i][goLeft] == 'F') {
-                            R[k][target] = reward;
-                        } else {
-                            R[k][target] = penalty;
-                        }
+                // Try to move right in the maze
+                int goRight = j + 1;
+                if (goRight < mazeWidth) {
+                    int target = i * mazeWidth + goRight;
+                    if (maze[i][goRight].equals(" ")) {
+                        R[k][target] = 0;
+                    } else if (maze[i][goRight].equals("F")) {
+                        R[k][target] = reward;
+                    } else {
+                        R[k][target] = penalty;
                     }
+                }
 
-                    // Try to move right in the maze
-                    int goRight = j + 1;
-                    if (goRight < mazeWidth) {
-                        int target = i * mazeWidth + goRight;
-                        if (maze[i][goRight] == '0') {
-                            R[k][target] = 0;
-                        } else if (maze[i][goRight] == 'F') {
-                            R[k][target] = reward;
-                        } else {
-                            R[k][target] = penalty;
-                        }
+                // Try to move up in the maze
+                int goUp = i - 1;
+                if (goUp >= 0) {
+                    int target = goUp * mazeWidth + j;
+                    if (maze[goUp][j].equals(" ")) {
+                        R[k][target] = 0;
+                    } else if (maze[goUp][j].equals("F")) {
+                        R[k][target] = reward;
+                    } else {
+                        R[k][target] = penalty;
                     }
+                }
 
-                    // Try to move up in the maze
-                    int goUp = i - 1;
-                    if (goUp >= 0) {
-                        int target = goUp * mazeWidth + j;
-                        if (maze[goUp][j] == '0') {
-                            R[k][target] = 0;
-                        } else if (maze[goUp][j] == 'F') {
-                            R[k][target] = reward;
-                        } else {
-                            R[k][target] = penalty;
-                        }
-                    }
-
-                    // Try to move down in the maze
-                    int goDown = i + 1;
-                    if (goDown < mazeHeight) {
-                        int target = goDown * mazeWidth + j;
-                        if (maze[goDown][j] == '0') {
-                            R[k][target] = 0;
-                        } else if (maze[goDown][j] == 'F') {
-                            R[k][target] = reward;
-                        } else {
-                            R[k][target] = penalty;
-                        }
+                // Try to move down in the maze
+                int goDown = i + 1;
+                if (goDown < mazeHeight) {
+                    int target = goDown * mazeWidth + j;
+                    if (maze[goDown][j].equals(" ")) {
+                        R[k][target] = 0;
+                    } else if (maze[goDown][j].equals("F")) {
+                        R[k][target] = reward;
+                    } else {
+                        R[k][target] = penalty;
                     }
                 }
             }
-            initializeQ();
-            printR(R);
-        } catch (IOException e) {
-            e.printStackTrace();
+            if (k == statesCount - 1) {
+                k = 0;
+            } else {
+                k++;
+            }
         }
+        initializeQ();
+        printR(R);
     }
+
     //Set Q values to R values
-    void initializeQ()
-    {
-        for (int i = 0; i < statesCount; i++){
-            for(int j = 0; j < statesCount; j++){
-                Q[i][j] = (double)R[i][j];
+    void initializeQ() {
+        for (int i = 0; i < statesCount; i++) {
+            for (int j = 0; j < statesCount; j++) {
+                Q[i][j] = (double) R[i][j];
             }
         }
     }
+
     // Used for debug
     void printR(int[][] matrix) {
         System.out.printf("%25s", "States: ");
@@ -199,7 +186,7 @@ class QLearning extends Maze{
         int i = state / mazeWidth;
         int j = state - i * mazeWidth;
 
-        return maze[i][j] == 'F';
+        return maze[i][j].equals("F");
     }
 
     int[] possibleActionsFromState(int state) {

@@ -24,22 +24,19 @@ public class Maze {
     private static final String START = "S";
     private static final String WALL = "|";
     private static final String ROOF = "-";
-    private static final String PATH = ".";
+    private static final String PATH = " ";
     private static final String HOLE = " ";
     //width and height: dimensions of maze
     private int width;
     private int height;
     private Random r;
+    private Point start;
 
     //CONSTRUCTOR
     public Maze(int width, int height) {
         this.width = width;
         this.height = height;
         this.r = new Random();
-    }
-
-    public Maze() {
-
     }
 
     //MAIN-METHODS
@@ -56,6 +53,7 @@ public class Maze {
         stack.push(new Point(randomStartLocation, 0));
         mazeCells.get(0).add(new MazeCell(new Point(randomStartLocation, 0), true));
         mazeCells.get(0).get(randomStartLocation).setStart(true);
+        this.start = new Point(randomStartLocation, 0);
         ArrayList<Point> alreadySearched = new ArrayList<Point>();
         ArrayList<Point> toSearch = new ArrayList<Point>();
         Point exit = new Point();
@@ -209,6 +207,10 @@ public class Maze {
             System.out.print("\n");
         }
         return toReturn;
+    }
+
+    public Point getStart(){
+        return this.start;
     }
 
     public int getHeight() {
