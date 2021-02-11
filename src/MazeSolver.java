@@ -20,6 +20,8 @@ class QLearning {
     private final int reward = 100;
     private final int penalty = -10;
 
+    private Maze mazeGenerator = new Maze(10, 5);
+
     private String[][] maze;  // Maze read from file
     private int[][] R;       // Reward lookup
     private double[][] Q;    // Q learning
@@ -39,10 +41,10 @@ class QLearning {
         ql.calculateQ();
         ql.printQ();
         ql.printPolicy();
+        ql.getPath();
     }
 
     public void init() {
-        Maze mazeGenerator = new Maze(10, 5);
         this.maze = mazeGenerator.getMaze();
         File file = new File("maze.txt");
         R = new int[statesCount][statesCount];
@@ -59,70 +61,74 @@ class QLearning {
             // to translate k into i and j
             i = k / mazeWidth;
             j = k - i * mazeWidth;
-            for(int r =0; r < this.mazeHeight; r++){
-                for(int c =0; c < this.mazeWidth; c++){
+            for (int r = 0; r < this.mazeHeight; r++) {
+                for (int c = 0; c < this.mazeWidth; c++) {
                     R[r][c] = -1;
                 }
             }
 
             // If not in final state or a wall try moving in all directions in the maze
-            if (!maze[i][j].equals("F")) {
-                // Try to move left in the maze
-                int goLeft = j - 1;
-                if (goLeft >= 0) {
-                    int target = i * mazeWidth + goLeft;
-                    if (maze[i][goLeft].equals(" ")) {
-                        R[k][target] = 0;
-                    } else if (maze[i][goLeft].equals("F")) {
-                        R[k][target] = reward;
-                    } else {
-                        R[k][target] = penalty;
+            try {
+                if (!maze[i][j].equals("F")) {
+                    // Try to move left in the maze
+                    int goLeft = j - 1;
+                    if (goLeft >= 0) {
+                        int target = i * mazeWidth + goLeft;
+                        if (maze[i][goLeft].equals(" ")) {
+                            R[k][target] = 0;
+                        } else if (maze[i][goLeft].equals("F")) {
+                            R[k][target] = reward;
+                        } else {
+                            R[k][target] = penalty;
+                        }
                     }
-                }
 
-                // Try to move right in the maze
-                int goRight = j + 1;
-                if (goRight < mazeWidth) {
-                    int target = i * mazeWidth + goRight;
-                    if (maze[i][goRight].equals(" ")) {
-                        R[k][target] = 0;
-                    } else if (maze[i][goRight].equals("F")) {
-                        R[k][target] = reward;
-                    } else {
-                        R[k][target] = penalty;
+                    // Try to move right in the maze
+                    int goRight = j + 1;
+                    if (goRight < mazeWidth) {
+                        int target = i * mazeWidth + goRight;
+                        if (maze[i][goRight].equals(" ")) {
+                            R[k][target] = 0;
+                        } else if (maze[i][goRight].equals("F")) {
+                            R[k][target] = reward;
+                        } else {
+                            R[k][target] = penalty;
+                        }
                     }
-                }
 
-                // Try to move up in the maze
-                int goUp = i - 1;
-                if (goUp >= 0) {
-                    int target = goUp * mazeWidth + j;
-                    if (maze[goUp][j].equals(" ")) {
-                        R[k][target] = 0;
-                    } else if (maze[goUp][j].equals("F")) {
-                        R[k][target] = reward;
-                    } else {
-                        R[k][target] = penalty;
+                    // Try to move up in the maze
+                    int goUp = i - 1;
+                    if (goUp >= 0) {
+                        int target = goUp * mazeWidth + j;
+                        if (maze[goUp][j].equals(" ")) {
+                            R[k][target] = 0;
+                        } else if (maze[goUp][j].equals("F")) {
+                            R[k][target] = reward;
+                        } else {
+                            R[k][target] = penalty;
+                        }
                     }
-                }
 
-                // Try to move down in the maze
-                int goDown = i + 1;
-                if (goDown < mazeHeight) {
-                    int target = goDown * mazeWidth + j;
-                    if (maze[goDown][j].equals(" ")) {
-                        R[k][target] = 0;
-                    } else if (maze[goDown][j].equals("F")) {
-                        R[k][target] = reward;
-                    } else {
-                        R[k][target] = penalty;
+                    // Try to move down in the maze
+                    int goDown = i + 1;
+                    if (goDown < mazeHeight) {
+                        int target = goDown * mazeWidth + j;
+                        if (maze[goDown][j].equals(" ")) {
+                            R[k][target] = 0;
+                        } else if (maze[goDown][j].equals("F")) {
+                            R[k][target] = reward;
+                        } else {
+                            R[k][target] = penalty;
+                        }
                     }
                 }
-            }
-            if (k == statesCount - 1) {
-                k = 0;
-            } else {
-                k++;
+                if (k == statesCount - 1) {
+                    k = 0;
+                } else {
+                    k++;
+                }
+            }catch (IndexOutOfBoundsException e){
+
             }
         }
         initializeQ();
@@ -181,7 +187,16 @@ class QLearning {
             }
         }
     }
-
+    public void getPath(){
+        System.out.println("Path:");
+        int state = (int) (mazeGenerator.getStart().getX()+mazeGenerator.getStart().getY());
+        int next;
+        do{
+            next = getPolicyFromState(state);
+            System.out.println("From "+state+" go to "+next);
+            state = next;
+        }while(!isFinalState(state));
+    }
     boolean isFinalState(int state) {
         int i = state / mazeWidth;
         int j = state - i * mazeWidth;
