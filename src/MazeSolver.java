@@ -133,6 +133,7 @@ class QLearning {
         }
         initializeQ();
         printR(R);
+        System.out.println("initialized");
     }
 
     //Set Q values to R values
@@ -164,11 +165,12 @@ class QLearning {
     void calculateQ() {
         Random rand = new Random();
 
-        for (int i = 0; i < 1000; i++) { // Train cycles
+       for (int i = 0; i < 1000; i++) { // Train cycles
             // Select random initial state
             int crtState = rand.nextInt(statesCount);
 
             while (!isFinalState(crtState)) {
+                //System.out.println("stuck in calculatedq");
                 int[] actionsFromCurrentState = possibleActionsFromState(crtState);
 
                 // Pick a random action from the ones possible
@@ -185,7 +187,8 @@ class QLearning {
 
                 crtState = nextState;
             }
-        }
+       }
+        System.out.println("calculatedQ");
     }
     public void getPath(){
         System.out.println("Path:");
@@ -233,6 +236,7 @@ class QLearning {
         for (int i = 0; i < statesCount; i++) {
             System.out.println("From state " + i + " goto state " + getPolicyFromState(i));
         }
+        System.out.println("printed policy");
     }
 
     int getPolicyFromState(int state) {
@@ -260,8 +264,9 @@ class QLearning {
             for (int j = 0; j < Q[i].length; j++) {
                 System.out.printf("%6.2f ", (Q[i][j]));
             }
-            System.out.println();
+            System.out.println("");
         }
+        System.out.println("printedQ");
     }
 }
 
